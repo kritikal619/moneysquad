@@ -2,6 +2,8 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <!-- 모바일 확대를 위한 뷰포트 설정 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>금액별 스쿼드</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/css/bootstrap-select.min.css">
@@ -81,6 +83,27 @@
       background: #73685d;
       padding: 0.3rem 1rem;
     }
+    
+    /* 모바일 확대 적용 (576px 이하) */
+    @media (max-width: 576px) {
+      body {
+        padding: 15px;
+        font-size: 18px;
+        padding-top: 60px;
+      }
+      .team-btn {
+        font-size: 18px;
+        padding: 15px;
+      }
+      .price-btn {
+        font-size: 16px;
+        padding: 15px;
+      }
+      input[type="text"] {
+        font-size: 18px;
+        padding: 12px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -155,7 +178,6 @@
       teamItem.appendChild(squadDisplay);
 
       teamBtn.addEventListener('click', function() {
-        // 닫기: 다른 팀들의 가격 옵션 닫기
         document.querySelectorAll('.price-options').forEach(div => {
           if (div !== priceOptions) {
             div.style.display = 'none';
@@ -164,7 +186,6 @@
             otherSquad.dataset.activePrice = "";
           }
         });
-        // 토글: 가격 옵션 열기/닫기
         if (priceOptions.style.display === 'block') {
           priceOptions.style.display = 'none';
           squadDisplay.innerHTML = '';
@@ -182,30 +203,25 @@
                 const team = this.dataset.team;
                 const price = this.dataset.price;
                 const imgUrl = data[team].prices[price];
-                // 토글: 동일 가격이면 삭제
                 if (squadDisplay.dataset.activePrice === price) {
                   squadDisplay.innerHTML = '';
                   squadDisplay.dataset.activePrice = "";
                 } else {
                   squadDisplay.innerHTML = '';
-                  // 이미지 추가
                   const img = document.createElement('img');
                   img.src = imgUrl;
                   img.alt = data[team].name + ' 스쿼드';
                   squadDisplay.appendChild(img);
 
-                  // 다운로드, 공유 버튼을 담을 그룹 생성
                   const btnGroup = document.createElement('div');
                   btnGroup.className = 'btn-group mt-2 d-block';
-                  
-                  // 다운로드 버튼
+
                   const downloadBtn = document.createElement('a');
                   downloadBtn.className = 'btn btn-primary';
                   downloadBtn.href = imgUrl;
-                  downloadBtn.download = '';  // 파일 다운로드
+                  downloadBtn.download = '';
                   downloadBtn.innerText = '다운로드';
-                  
-                  // 공유 버튼
+
                   const shareBtn = document.createElement('button');
                   shareBtn.className = 'btn btn-secondary';
                   shareBtn.innerText = '공유';
@@ -219,12 +235,11 @@
                       prompt("공유 링크를 복사하세요:", imgUrl);
                     }
                   });
-                  
+
                   btnGroup.appendChild(downloadBtn);
                   btnGroup.appendChild(shareBtn);
-                  // 이미지 바로 아래에 버튼 그룹 추가
                   squadDisplay.appendChild(btnGroup);
-                  
+
                   squadDisplay.dataset.activePrice = price;
                 }
               });
@@ -279,5 +294,7 @@
       }
     }
   </script>
+  <!-- 부트스트랩 JS 추가: 햄버거 메뉴 기능을 위해 필요 -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
