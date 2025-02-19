@@ -22,7 +22,7 @@
       box-sizing: border-box;
       margin-bottom: 20px;
     }
-    /* 팀 아이템 컨테이너 (각 팀 별 구분선 추가) */
+    /* 팀 아이템 컨테이너 */
     .team-item {
       margin-bottom: 20px;
       background: #fff;
@@ -43,14 +43,13 @@
     .team-btn:hover {
       background: #eaeaea;
     }
-    /* 가격 옵션 컨테이너 (초기엔 숨김, 팀 내부에 인덴트 적용) */
+    /* 가격 옵션 컨테이너 (팀 내부에 인덴트 적용) */
     .price-options {
       display: none;
       border-top: 1px solid #ddd;
       background: #fff;
-      padding-left: 20px; /* 인덴트 추가 */
+      padding-left: 20px;
     }
-    /* 각 가격 버튼에 구분 선 추가 (마지막 버튼 제외) */
     .price-options .price-btn {
       width: 100%;
       text-align: left;
@@ -66,7 +65,7 @@
     .price-btn:hover {
       background: #f0f0f0;
     }
-    /* 스쿼드 이미지가 들어갈 영역 */
+    /* 스쿼드 이미지와 버튼 그룹 영역 */
     .squad-display {
       text-align: center;
       margin-top: 10px;
@@ -85,10 +84,8 @@
   </style>
 </head>
 <body>
-
   <nav id="navbar" class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container-fluid">
-      <!-- 뒤로가기 버튼 -->
       <a class="navbar-brand" href="#" id="toolTabButton">FC모바일 금액별 스쿼드</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
         <span class="navbar-toggler-icon"></span>
@@ -108,12 +105,11 @@
     <input type="text" id="search" placeholder="예: 팀 1 1000 (엔터키로 검색)">
   </div>
 
-  <!-- 팀 목록이 들어갈 영역 -->
+  <!-- 팀 목록 영역 -->
   <div id="teamsContainer"></div>
 
   <script>
-    // 데이터 수정: GitHub 레포 내의 이미지 파일 경로를 사용 (상대경로 예시)
-    // GitHub Pages를 사용 중이면 URL을 "https://your-username.github.io/your-repo-name/images/파일이름" 형식으로 사용할 수 있습니다.
+    // 데이터: GitHub 레포 내 이미지 파일 경로 사용 (상대경로 예시)
     const data = {
       team1: {
         name: "레알 마드리드",
@@ -137,54 +133,43 @@
 
     const teamsContainer = document.getElementById('teamsContainer');
     const searchInput = document.getElementById('search');
-
-    // 각 팀의 요소들을 저장하는 객체 (나중에 검색 시 사용)
     const teamElements = {};
 
-    // 데이터에 있는 팀들을 기반으로 팀 버튼 생성
     Object.keys(data).forEach(teamKey => {
-      // 팀 아이템 컨테이너 생성
       const teamItem = document.createElement('div');
       teamItem.className = 'team-item';
 
-      // 팀 버튼 생성
       const teamBtn = document.createElement('button');
       teamBtn.className = 'team-btn';
       teamBtn.textContent = data[teamKey].name;
       teamBtn.dataset.team = teamKey;
       teamItem.appendChild(teamBtn);
 
-      // 가격 옵션 컨테이너 생성 (초기엔 숨김, 인덴트 적용됨)
       const priceOptions = document.createElement('div');
       priceOptions.className = 'price-options';
       teamItem.appendChild(priceOptions);
 
-      // 스쿼드 이미지를 표시할 영역 (가격 옵션 아래)
       const squadDisplay = document.createElement('div');
       squadDisplay.className = 'squad-display';
-      // 현재 선택된 가격을 저장할 데이터 속성
       squadDisplay.dataset.activePrice = "";
       teamItem.appendChild(squadDisplay);
 
-      // 팀 버튼 클릭 시 가격 옵션 토글 (펼치거나 숨김)
       teamBtn.addEventListener('click', function() {
-        // 다른 팀들의 옵션은 닫기
+        // 닫기: 다른 팀들의 가격 옵션 닫기
         document.querySelectorAll('.price-options').forEach(div => {
           if (div !== priceOptions) {
             div.style.display = 'none';
-            // 해당 팀의 스쿼드 영역 초기화
             const otherSquad = div.parentElement.querySelector('.squad-display');
             otherSquad.innerHTML = '';
             otherSquad.dataset.activePrice = "";
           }
         });
-        // 토글: 이미 열려있으면 닫고, 아니면 열기
+        // 토글: 가격 옵션 열기/닫기
         if (priceOptions.style.display === 'block') {
           priceOptions.style.display = 'none';
-          squadDisplay.innerHTML = ''; // 가격 옵션 닫으면 스쿼드도 초기화
+          squadDisplay.innerHTML = '';
           squadDisplay.dataset.activePrice = "";
         } else {
-          // 가격 옵션 영역에 버튼 추가 (한번만 추가되도록)
           if (!priceOptions.hasChildNodes()) {
             Object.keys(data[teamKey].prices).forEach(price => {
               const priceBtn = document.createElement('button');
@@ -192,23 +177,54 @@
               priceBtn.textContent = price + '억';
               priceBtn.dataset.team = teamKey;
               priceBtn.dataset.price = price;
-              // 가격 버튼 클릭 시 해당 스쿼드 이미지 토글
               priceBtn.addEventListener('click', function(e) {
-                // 이벤트 전파를 막아 팀 버튼의 토글이 동작하지 않도록 함
                 e.stopPropagation();
                 const team = this.dataset.team;
                 const price = this.dataset.price;
                 const imgUrl = data[team].prices[price];
-                // 만약 이미 선택된 가격이면 스쿼드 이미지를 제거 (토글)
+                // 토글: 동일 가격이면 삭제
                 if (squadDisplay.dataset.activePrice === price) {
                   squadDisplay.innerHTML = '';
                   squadDisplay.dataset.activePrice = "";
                 } else {
                   squadDisplay.innerHTML = '';
+                  // 이미지 추가
                   const img = document.createElement('img');
                   img.src = imgUrl;
                   img.alt = data[team].name + ' 스쿼드';
                   squadDisplay.appendChild(img);
+
+                  // 다운로드, 공유 버튼을 담을 그룹 생성
+                  const btnGroup = document.createElement('div');
+                  btnGroup.className = 'btn-group mt-2 d-block';
+                  
+                  // 다운로드 버튼
+                  const downloadBtn = document.createElement('a');
+                  downloadBtn.className = 'btn btn-primary';
+                  downloadBtn.href = imgUrl;
+                  downloadBtn.download = '';  // 파일 다운로드
+                  downloadBtn.innerText = '다운로드';
+                  
+                  // 공유 버튼
+                  const shareBtn = document.createElement('button');
+                  shareBtn.className = 'btn btn-secondary';
+                  shareBtn.innerText = '공유';
+                  shareBtn.addEventListener('click', function() {
+                    if (navigator.share) {
+                      navigator.share({
+                        title: data[team].name + ' 스쿼드',
+                        url: imgUrl
+                      }).catch(err => console.error("공유 실패:", err));
+                    } else {
+                      prompt("공유 링크를 복사하세요:", imgUrl);
+                    }
+                  });
+                  
+                  btnGroup.appendChild(downloadBtn);
+                  btnGroup.appendChild(shareBtn);
+                  // 이미지 바로 아래에 버튼 그룹 추가
+                  squadDisplay.appendChild(btnGroup);
+                  
                   squadDisplay.dataset.activePrice = price;
                 }
               });
@@ -220,57 +236,36 @@
       });
 
       teamsContainer.appendChild(teamItem);
-      // 저장: 나중에 검색 시 해당 팀 요소에 접근하기 위해
-      teamElements[teamKey] = {
-        teamItem,
-        teamBtn,
-        priceOptions,
-        squadDisplay
-      };
+      teamElements[teamKey] = { teamItem, teamBtn, priceOptions, squadDisplay };
     });
 
-    // 검색 입력에서 엔터키 입력 시 실행
     searchInput.addEventListener('keypress', function(e) {
       if (e.key === "Enter") {
         processSearch();
       }
     });
 
-    // 검색어 처리 함수
     function processSearch() {
       const query = searchInput.value.trim().toLowerCase();
       if (!query) return;
-
-      // 예시로, 검색어에 팀 이름과 가격(숫자)이 포함되어 있다고 가정합니다.
-      // 예: "팀 1 1000" 또는 "팀1 2000"
       let foundTeamKey = null;
       let foundPrice = null;
-
-      // 먼저 팀 이름 매칭 (data의 name 속성을 이용)
       Object.keys(data).forEach(teamKey => {
         const teamName = data[teamKey].name.toLowerCase();
         if (query.indexOf(teamName) > -1) {
           foundTeamKey = teamKey;
         }
       });
-
-      // 검색어에서 숫자(가격)를 찾아봅니다.
       const priceMatch = query.match(/\d+/);
       if (priceMatch) {
         foundPrice = priceMatch[0];
       }
-
       if (foundTeamKey) {
-        // 해당 팀의 버튼을 강제로 클릭하여 가격 옵션을 펼칩니다.
         const { teamItem, teamBtn, priceOptions, squadDisplay } = teamElements[foundTeamKey];
-        // 만약 가격 옵션이 닫혀있다면 열기 위한 클릭
         if (priceOptions.style.display !== 'block') {
           teamBtn.click();
         }
-        // 스크롤을 부드럽게 해당 팀 영역으로 이동
         teamItem.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-        // 가격이 검색어에 포함되어 있고, 해당 팀의 가격 옵션에 존재하면 자동 클릭
         if (foundPrice) {
           setTimeout(() => {
             const priceBtns = priceOptions.querySelectorAll('.price-btn');
