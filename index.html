@@ -43,11 +43,12 @@
     .team-btn:hover {
       background: #eaeaea;
     }
-    /* 가격 옵션 컨테이너 (초기엔 숨김) */
+    /* 가격 옵션 컨테이너 (초기엔 숨김, 팀 내부에 인덴트 적용) */
     .price-options {
       display: none;
       border-top: 1px solid #ddd;
       background: #fff;
+      padding-left: 20px; /* 인덴트 추가 */
     }
     /* 각 가격 버튼에 구분 선 추가 (마지막 버튼 제외) */
     .price-options .price-btn {
@@ -76,8 +77,7 @@
       max-width: 100%;
       height: auto;
     }
-
-        /* 네비게이션 바 */
+    /* 네비게이션 바 */
     #navbar {
       background: #73685d;
       padding: 0.3rem 1rem;
@@ -86,22 +86,22 @@
 </head>
 <body>
 
-    <nav id="navbar" class="navbar navbar-expand-lg navbar-dark fixed-top">
-        <div class="container-fluid">
-          <!-- 뒤로가기 버튼 -->
-          <a class="navbar-brand" href="#" id="toolTabButton"></a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarContent">
-            <ul class="navbar-nav ms-auto">
-              <li class="nav-item"><a class="nav-link" href="https://kritikal619.github.io/card/" target="_blank">피모합성소</a></li>
-              <li class="nav-item"><a class="nav-link" href="https://kritikal619.github.io/trait/" target="_blank">피모 특성</a></li>
-              <li class="nav-item"><a class="nav-link" href="http://fcevol.kro.kr" target="_blank">진화 시뮬레이션</a></li>
-            </ul>
-          </div>
-        </div>
-      </nav>
+  <nav id="navbar" class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container-fluid">
+      <!-- 뒤로가기 버튼 -->
+      <a class="navbar-brand" href="#" id="toolTabButton"></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="https://kritikal619.github.io/card/" target="_blank">피모합성소</a></li>
+          <li class="nav-item"><a class="nav-link" href="https://kritikal619.github.io/trait/" target="_blank">피모 특성</a></li>
+          <li class="nav-item"><a class="nav-link" href="http://fcevol.kro.kr" target="_blank">진화 시뮬레이션</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
 
   <!-- 상단 검색창 -->
   <div class="input-group">
@@ -112,20 +112,23 @@
   <div id="teamsContainer"></div>
 
   <script>
-    // 예시 데이터: 팀별 가격 옵션과 스쿼드 이미지 URL
+    // 데이터 수정: GitHub 레포 내의 이미지 파일 경로를 사용 (상대경로 예시)
+    // GitHub Pages를 사용 중이면 URL을 "https://your-username.github.io/your-repo-name/images/파일이름" 형식으로 사용할 수 있습니다.
     const data = {
       team1: {
-        name: "팀 1",
+        name: "레알 마드리드",
         prices: {
-          '1000': 'https://via.placeholder.com/300x200?text=Team1+Price1000',
-          '2000': 'https://via.placeholder.com/300x200?text=Team1+Price2000'
+          '500': './images/500억레알.png',
+          '1000': './images/1000억레알.png',
+          '3000': './images/3000억레알.png',
+          '8000': './images/8000억레알.png'
         }
       },
       team2: {
         name: "팀 2",
         prices: {
-          '1500': 'https://via.placeholder.com/300x200?text=Team2+Price1500',
-          '2500': 'https://via.placeholder.com/300x200?text=Team2+Price2500'
+          '1500': './images/team2-price1500.png',
+          '2500': './images/team2-price2500.png'
         }
       }
     };
@@ -149,7 +152,7 @@
       teamBtn.dataset.team = teamKey;
       teamItem.appendChild(teamBtn);
 
-      // 가격 옵션 컨테이너 생성 (초기엔 숨김)
+      // 가격 옵션 컨테이너 생성 (초기엔 숨김, 인덴트 적용됨)
       const priceOptions = document.createElement('div');
       priceOptions.className = 'price-options';
       teamItem.appendChild(priceOptions);
@@ -168,8 +171,9 @@
           if (div !== priceOptions) {
             div.style.display = 'none';
             // 해당 팀의 스쿼드 영역 초기화
-            div.parentElement.querySelector('.squad-display').innerHTML = '';
-            div.parentElement.querySelector('.squad-display').dataset.activePrice = "";
+            const otherSquad = div.parentElement.querySelector('.squad-display');
+            otherSquad.innerHTML = '';
+            otherSquad.dataset.activePrice = "";
           }
         });
         // 토글: 이미 열려있으면 닫고, 아니면 열기
@@ -249,7 +253,6 @@
       });
 
       // 검색어에서 숫자(가격)를 찾아봅니다.
-      // 단순하게 정규표현식을 사용합니다.
       const priceMatch = query.match(/\d+/);
       if (priceMatch) {
         foundPrice = priceMatch[0];
@@ -267,9 +270,7 @@
 
         // 가격이 검색어에 포함되어 있고, 해당 팀의 가격 옵션에 존재하면 자동 클릭
         if (foundPrice) {
-          // 잠시 후(애니메이션 고려) 실행
           setTimeout(() => {
-            // priceOptions 내부의 버튼들을 순회
             const priceBtns = priceOptions.querySelectorAll('.price-btn');
             priceBtns.forEach(btn => {
               if (btn.dataset.price === foundPrice) {
